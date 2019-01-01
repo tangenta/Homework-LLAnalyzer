@@ -5,7 +5,7 @@ trait Symbol {
 }
 case class Term(str: String) extends Symbol
 case class NonTerm(str: String) extends Symbol
-object Empty { val value = Term("`empty`") }
+object Empty { val value = Term("empty") }
 object EOS { val value = Term("$") }
 
 case class Production(head: NonTerm, body: List[Symbol])

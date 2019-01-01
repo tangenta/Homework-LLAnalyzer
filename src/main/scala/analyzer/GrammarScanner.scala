@@ -22,6 +22,6 @@ object GrammarScanner {
     if (head.length != 1) throw new RuntimeException(s"syntax error in head at $prod")
     if (body.isEmpty) throw new RuntimeException(s"syntax error in body at $prod")
 
-    (head(0), body.map(s => if (s == "empty") "" else s).toList)
+    (head(0), body.map(s => if (s == Empty.value.str) "" else s).toList)
   }
 }

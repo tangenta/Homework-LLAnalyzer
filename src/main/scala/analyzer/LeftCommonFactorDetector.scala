@@ -21,10 +21,11 @@ trait LeftCommonFactorDetector extends Algorithm {
     else {
       val sample = lcpp.head
       val newNonTerm = NonTerm(sample.head.str + "\'" * primes2Append)
+      def convEmpty(symbols: List[Symbol]) = if (symbols.isEmpty) List(Empty.value) else symbols
       splitRecursive(
         Production(sample.head, sample.body.take(len) ++ List(newNonTerm)) ::
           prods.filterNot(lcpp.contains)
-        , primes2Append + 1) ::: lcpp.map(p => Production(newNonTerm, p.body.drop(len))).toList
+        , primes2Append + 1) ::: lcpp.map(p => Production(newNonTerm, convEmpty(p.body.drop(len)))).toList
     }
   }
 
