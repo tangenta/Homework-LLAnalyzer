@@ -1,7 +1,7 @@
 package analyzer
 
 object GrammarScanner {
-  val algorithm: Algorithm with LeftCommonFactorDetector with LeftRecursiveDetector =
+  val algorithm =
     new Algorithm with LeftCommonFactorDetector with LeftRecursiveDetector
   import algorithm._
 

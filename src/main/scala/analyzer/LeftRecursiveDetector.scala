@@ -64,8 +64,8 @@ trait LeftRecursiveDetector extends Algorithm {
     * Eliminate direct left recursion in a set of productions.
     *
     * Assumed that the heads of productions are the same.
-    * @param prods a set of productions
-    * @return another set of productions
+    * @param prods a list of productions
+    * @return another list of productions
     */
   private def eliminate(prods: List[Production]): List[Production] = {
     val isRecursive = (p: Production) => p.head == p.body.head
@@ -88,7 +88,7 @@ trait LeftRecursiveDetector extends Algorithm {
     * with {{{A -> B}}} into {{{S -> B b}}}
     * @param source a set of productions to substitute
     * @param dest a set of productions to be substituted
-    * @return
+    * @return a list of productions after substitution
     */
   private def substitute(source: Set[Production], dest: Set[Production]): List[Production] = {
     dest.flatMap { prod =>
