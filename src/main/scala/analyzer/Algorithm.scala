@@ -1,6 +1,5 @@
 package analyzer
 
-import scala.annotation.tailrec
 
 class Algorithm {
   def construct(prods: List[(String, List[String])]): List[Production] = {
@@ -121,13 +120,13 @@ class Algorithm {
       parsingListener.onStepping(symbols, restTerms)
       (symbols, restTerms) match {
         case (s, Nil) => s.isEmpty
-        case (List(Empty.value, sr: List[Symbol]), r) => helper(sr, r)
-        case (List(t: Term, sr: List[Symbol]), r) if t == r.head =>
+        case (List(Empty.value, _), r) => helper(symbols.tail, r)
+        case (List(t: Term, _), r) if t == r.head =>
           parsingListener.onMatching(t)
-          helper(sr, r.tail)
-        case (List(nt: NonTerm, sr: List[Symbol]), r) => table.get(nt, r.head).exists { p =>
+          helper(symbols.tail, r.tail)
+        case (List(nt: NonTerm, _), r) => table.get(nt, r.head).exists { p =>
           parsingListener.onDeriving(p)
-          helper(p.body ::: sr, r)
+          helper(p.body ::: symbols.tail, r)
         }
         case _ => false
       }
