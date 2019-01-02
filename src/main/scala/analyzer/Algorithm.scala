@@ -1,5 +1,7 @@
 package analyzer
 
+import scala.annotation.tailrec
+
 class Algorithm {
   def construct(prods: List[(String, List[String])]): List[Production] = {
     val nt = prods.map(_._1).toSet
@@ -49,12 +51,10 @@ class Algorithm {
   }
 
   // prone to stack overflow when handling left recursive grammar
-  def first(prods: List[Production], symbol: Symbol): Set[Term] = {
-    symbol match {
-      case term: Term => Set(term)
-      case nonTerm: NonTerm => prods.toSet.withFilter(_.head == nonTerm).flatMap {
-        prod => first(prods, prod.body)
-      }
+  def first(prods: List[Production], symbol: Symbol): Set[Term] = symbol match {
+    case term: Term => Set(term)
+    case nonTerm: NonTerm => prods.toSet.withFilter(_.head == nonTerm).flatMap {
+      prod => first(prods, prod.body)
     }
   }
 
@@ -119,25 +119,17 @@ class Algorithm {
                parsingListener: ParsingListener = new ParsingListener): Boolean = {
     def helper(symbols: List[Symbol], restTerms: List[Term]): Boolean = {
       parsingListener.onStepping(symbols, restTerms)
-      if (restTerms.isEmpty)
-        symbols.isEmpty
-      else {
-        symbols.head match {
-          case empty if empty == Empty.value =>
-            helper(symbols.tail, restTerms)
-          case t: Term =>
-            if (t != restTerms.head) false
-            else {
-              parsingListener.onMatching(t)
-              helper(symbols.tail, restTerms.tail)
-            }
-          case nt: NonTerm =>
-            val optionProd = table.get(nt, restTerms.head)
-            optionProd.exists { p =>
-              parsingListener.onDeriving(p)
-              helper(p.body ::: symbols.tail, restTerms)
-            }
+      (symbols, restTerms) match {
+        case (s, Nil) => s.isEmpty
+        case (List(Empty.value, sr: List[Symbol]), r) => helper(sr, r)
+        case (List(t: Term, sr: List[Symbol]), r) if t == r.head =>
+          parsingListener.onMatching(t)
+          helper(sr, r.tail)
+        case (List(nt: NonTerm, sr: List[Symbol]), r) => table.get(nt, r.head).exists { p =>
+          parsingListener.onDeriving(p)
+          helper(p.body ::: sr, r)
         }
+        case _ => false
       }
     }
 

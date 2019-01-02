@@ -36,12 +36,12 @@ trait LeftRecursiveDetector extends Algorithm {
   def eliminateLeftRecursion(prods: List[Production]): List[Production] = {
     type ProdGroup = List[Production]
     type PGroupList = List[ProdGroup]
-    def helper(result: PGroupList, rest: PGroupList): (PGroupList, PGroupList) = {
-      if (rest.isEmpty) (result, rest)
-      else {
+    def helper(result: PGroupList, rest: PGroupList): (PGroupList, PGroupList) = rest match {
+      case Nil => (result, rest)
+      case _ =>
         val tmp = eliminate(rest.head)
-        helper(tmp :: result, rest.tail.map(rest => substitute(tmp.toSet, rest.toSet)))   // fixme: need optimize
-      }
+        helper(tmp :: result, rest.tail.map(rest =>
+          substitute(tmp.toSet, rest.toSet)))   // fixme: need optimize
     }
     helper(List.empty, orderedGrouping(prods))._1.reverse.flatten
   }
